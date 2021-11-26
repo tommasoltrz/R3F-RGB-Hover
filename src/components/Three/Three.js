@@ -17,13 +17,12 @@ import { CustomShaderMaterial } from "./shader";
 
 const Imager = React.memo(({ img }) => {
   const ref = useRef();
-
   const rec = img.getBoundingClientRect();
   const texture = useLoader(THREE.TextureLoader, img.src);
   const elHeight = rec.height;
   const elWidth = rec.width;
   useEffect(() => {
-    img.style.opacity = 0.5;
+    img.style.opacity = 0;
 
     let imageAspect = elHeight / elWidth;
     let a1;
@@ -53,7 +52,7 @@ const Imager = React.memo(({ img }) => {
     <mesh
       position={[
         0 - window.innerWidth / 2 + rec.left + rec.width / 2,
-        window.innerHeight / 2 - rec.height / 2 - rec.y,
+        window.innerHeight / 2 - rec.height / 2 - rec.y - window.scrollY,
         0,
       ]}
       scale={[1, 1, 1]}
@@ -148,16 +147,17 @@ function Effect({ mouse }) {
 const Three = () => {
   const pos = useContext(Context);
   const ref = useRef();
-  const collection = Array.from(document.getElementsByClassName("js-img"));
+  const [collection, setCollection] = useState();
+  const [offset, setOffset] = useState();
 
   useEffect(() => {
+    setCollection(Array.from(document.getElementsByClassName("js-img")));
     document.addEventListener("scroll", onWinScroll);
     return () => document.removeEventListener("scroll", onWinScroll);
   }, []);
 
   const onWinScroll = (ev) => {
-    console.log(window.scrollY);
-    ref.current.style.transform = `translateY(${-window.scrollY}px)`;
+    setOffset(window.scrollY);
   };
 
   return (
@@ -170,7 +170,7 @@ const Three = () => {
       style={{
         position: "fixed",
         height: "100%",
-        // overflow: "hidden",
+        overflow: "hidden",
         top: 0,
         left: 0,
 
@@ -181,8 +181,11 @@ const Three = () => {
       }}
     >
       <Suspense fallback={null}>
-        {collection && collection.map((img, i) => <Imager img={img} key={i} />)}
-        <Effect mouse={pos} />
+        <group position={[0, offset || 0, 0]}>
+          {collection &&
+            collection.map((img, i) => <Imager img={img} key={i} />)}
+          <Effect mouse={pos} />
+        </group>
       </Suspense>
     </Canvas>
   );

@@ -19,12 +19,15 @@ const IndexPage = () => {
             className={cn(styles.image, "js-img")}
             id="texture"
           />
+
+          <h1>Helloooo</h1>
           <img
             src={img2}
             alt=""
             className={cn(styles.image, "js-img")}
             id="texture2"
           />
+          <h1>Helloooo</h1>
           <img
             src={img3}
             alt=""
