@@ -1,4 +1,3 @@
-import * as styles from "./Three.module.scss";
 import * as THREE from "three";
 import React, {
   useMemo,
@@ -13,21 +12,18 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import { Context } from "../StoreProvider/StoreProvider";
-import { CustomShaderMaterial } from "./shader";
+import { CustomShaderMaterial } from "./shaderMaterial";
 
 const Imager = React.memo(({ img, wSize }) => {
   const ref = useRef();
   const [rec, setRec] = useState(img.getBoundingClientRect());
-  useEffect(() => {
-    setRec(img.getBoundingClientRect());
-  }, [wSize]);
 
   const texture = useLoader(THREE.TextureLoader, img.src);
   const elHeight = rec.height;
   const elWidth = rec.width;
   useEffect(() => {
+    setRec(img.getBoundingClientRect());
     img.style.opacity = 0;
-
     let imageAspect = elHeight / elWidth;
     let a1;
     let a2;
@@ -50,13 +46,13 @@ const Imager = React.memo(({ img, wSize }) => {
       "#extension GL_OES_standard_derivatives : enable";
     ref.current.side = THREE.DoubleSide;
     ref.current.uvRate1 = new THREE.Vector2(1, 1);
-  }, []);
+  }, [wSize]);
 
   return (
     <mesh
       position={[
         0 - wSize.w / 2 + rec.left + rec.width / 2,
-        wSize.h / 2 - rec.height / 2 - rec.y,
+        wSize.h / 2 - rec.height / 2 - rec.y - window.scrollY,
         0,
       ]}
       scale={[1, 1, 1]}
@@ -149,17 +145,9 @@ const Three = () => {
   const { mouse, wSize, top } = useContext(Context);
   const ref = useRef();
   const [collection, setCollection] = useState();
-  const [offset, setOffset] = useState();
   useEffect(() => {
-    setOffset(window.scrollY);
     setCollection(Array.from(document.getElementsByClassName("js-img")));
-    document.addEventListener("scroll", onWinScroll);
-    return () => document.removeEventListener("scroll", onWinScroll);
   }, []);
-
-  const onWinScroll = (ev) => {
-    setOffset(window.scrollY);
-  };
 
   return (
     <Canvas
@@ -176,7 +164,7 @@ const Three = () => {
         left: 0,
         width: "100%",
         backgroundColor: "transparent",
-        zIndex: -1,
+        zIndex: 0,
         pointerEvents: "none",
       }}
     >

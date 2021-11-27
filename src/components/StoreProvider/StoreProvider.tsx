@@ -16,6 +16,7 @@ export const StoreProvider: FC<any> = ({ children }) => {
   const [mouse, setMouse] = useState(initialState.mouse);
   const [wSize, setWSize] = useState(initialState.wSize);
   const [top, setTop] = useState(initialState.top);
+  const [topThree, setTopThree] = useState(0);
   const requestRef = useRef<number>();
 
   let current = 0;
@@ -42,6 +43,7 @@ export const StoreProvider: FC<any> = ({ children }) => {
     target = window.scrollY;
     current = MathUtils.lerp(current, target, ease);
     setTop(current);
+    setTopThree(0);
     requestRef.current = requestAnimationFrame(updateScroll);
   };
 

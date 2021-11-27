@@ -22,20 +22,21 @@ const IndexPage = () => {
               id="texture"
             />
 
-            <h1>Helloooo</h1>
+            <h2>Caption 1</h2>
             <img
               src={img2}
               alt=""
               className={cn(styles.image, "js-img")}
               id="texture2"
             />
-            <h1>Helloooo</h1>
+            <h2>Caption 2</h2>
             <img
               src={img3}
               alt=""
               className={cn(styles.image, "js-img")}
               id="texture2"
             />
+            <h2>Caption 3</h2>
           </div>
         </div>
       </Layout>

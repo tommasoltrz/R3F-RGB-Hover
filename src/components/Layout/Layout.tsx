@@ -1,19 +1,16 @@
 import * as React from "react";
 import * as styles from "./Layout.module.scss";
+import { Context } from "../StoreProvider/StoreProvider";
+import { useContext, useEffect } from "react";
 
-import { Context, StoreProvider } from "../StoreProvider/StoreProvider";
-import Three from "../Three/Three";
-import cn from "classnames";
-import { useContext, useEffect, useRef, useState } from "react";
 const Layout = ({ children }) => {
-  const scrollArea = useRef();
-  const { top } = useContext(Context);
-  console.log(top);
+  const scrollArea = React.createRef<HTMLDivElement>();
+  const { top, wSize } = useContext(Context);
 
   useEffect(() => {
     setTimeout(() => {
       document.body.style.height = `${
-        scrollArea?.current.getBoundingClientRect().height
+        scrollArea?.current?.getBoundingClientRect().height
       }px`;
     }, 100);
   }, []);
@@ -22,12 +19,16 @@ const Layout = ({ children }) => {
     scrollArea.current.style.transform = `translate3d(0,${-top}px, 0)`;
   }, [top]);
 
+  useEffect(() => {
+    document.body.style.height = `${
+      scrollArea?.current?.getBoundingClientRect().height
+    }px`;
+  }, [wSize]);
+
   return (
-    <StoreProvider>
-      <main ref={scrollArea} data-scroll className={styles.scrollArea}>
-        {children}
-      </main>
-    </StoreProvider>
+    <main ref={scrollArea} data-scroll className={styles.scrollArea}>
+      {children}
+    </main>
   );
 };
 
