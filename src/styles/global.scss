@@ -9,9 +9,8 @@ body {
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   font-size: 14px;
   color: #111111;
-  background-color: #f7f8fb;
   overflow-x: hidden;
-  height: 3000px;
+  overscroll-behavior-y: none;
 }
 
 h1,

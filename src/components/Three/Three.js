@@ -12,21 +12,17 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import { Context } from "../StoreProvider/StoreProvider";
-import { CustomShaderMaterial } from "./shader";
+import { CustomShaderMaterial } from "./shaderMaterial";
 
 const Imager = React.memo(({ img, wSize }) => {
   const ref = useRef();
   const [rec, setRec] = useState(img.getBoundingClientRect());
-  useEffect(() => {
-    setRec(img.getBoundingClientRect());
-  }, [wSize]);
-
   const texture = useLoader(THREE.TextureLoader, img.src);
   const elHeight = rec.height;
   const elWidth = rec.width;
   useEffect(() => {
+    setRec(img.getBoundingClientRect());
     img.style.opacity = 0;
-
     let imageAspect = elHeight / elWidth;
     let a1;
     let a2;
@@ -49,7 +45,7 @@ const Imager = React.memo(({ img, wSize }) => {
       "#extension GL_OES_standard_derivatives : enable";
     ref.current.side = THREE.DoubleSide;
     ref.current.uvRate1 = new THREE.Vector2(1, 1);
-  }, []);
+  }, [wSize]);
 
   return (
     <mesh
@@ -79,7 +75,7 @@ function Effect({ mouse, wSize }) {
       uniforms: {
         tDiffuse: { value: null },
         resolution: {
-          value: new THREE.Vector2(1, window.innerHeight / window.innerWidth),
+          value: new THREE.Vector2(1, wSize.h / wSize.w),
         },
         uMouse: { value: new THREE.Vector2(-10, -10) },
         uVelo: { value: 0 },
@@ -145,21 +141,12 @@ function Effect({ mouse, wSize }) {
 }
 
 const Three = () => {
-  const { mouse, wSize } = useContext(Context);
+  const { mouse, wSize, top } = useContext(Context);
   const ref = useRef();
   const [collection, setCollection] = useState();
-  const [offset, setOffset] = useState();
-
   useEffect(() => {
-    setOffset(window.scrollY);
     setCollection(Array.from(document.getElementsByClassName("js-img")));
-    document.addEventListener("scroll", onWinScroll);
-    return () => document.removeEventListener("scroll", onWinScroll);
   }, []);
-
-  const onWinScroll = (ev) => {
-    setOffset(window.scrollY);
-  };
 
   return (
     <Canvas
@@ -176,13 +163,13 @@ const Three = () => {
         left: 0,
         width: "100%",
         backgroundColor: "transparent",
-        zIndex: -1,
+        zIndex: 0,
         pointerEvents: "none",
       }}
     >
       <Suspense fallback={null}>
-        {offset !== undefined && collection && (
-          <group position={[0, offset, 0]}>
+        {top !== undefined && collection && (
+          <group position={[0, top, 0]}>
             {collection.map((img, i) => (
               <Imager img={img} key={i} wSize={wSize} />
             ))}

@@ -3,38 +3,43 @@ import * as styles from "./index.module.scss";
 import img1 from "../images/test-1.jpeg";
 import img2 from "../images/test-2.jpeg";
 import img3 from "../images/test-3.jpeg";
-import { StoreProvider } from "../components/StoreProvider/StoreProvider";
+
 import Three from "../components/Three/Three";
 import cn from "classnames";
+import Layout from "../components/Layout/Layout";
+import { StoreProvider } from "../components/StoreProvider/StoreProvider";
 const IndexPage = () => {
   return (
     <StoreProvider>
-      <main className={styles.container}>
-        <h1 className={styles.title}> I am a title</h1>
-        <div className={styles.imgContainer}>
-          <img
-            src={img1}
-            alt=""
-            className={cn(styles.image, "js-img")}
-            id="texture"
-          />
-          <h2>caption 1</h2>
-          <img
-            src={img2}
-            alt=""
-            className={cn(styles.image, "js-img")}
-            id="texture2"
-          />
-          <h2>caption 2</h2>
-          <img
-            src={img3}
-            alt=""
-            className={cn(styles.image, "js-img")}
-            id="texture2"
-          />
-          <h2>caption 3</h2>
+      <Layout>
+        <div>
+          <h1 className={styles.title}> I am a title</h1>
+          <div className={styles.imgContainer}>
+            <img
+              src={img1}
+              alt=""
+              className={cn(styles.image, "js-img")}
+              id="texture"
+            />
+
+            <h2>Caption 1</h2>
+            <img
+              src={img2}
+              alt=""
+              className={cn(styles.image, "js-img")}
+              id="texture2"
+            />
+            <h2>Caption 2</h2>
+            <img
+              src={img3}
+              alt=""
+              className={cn(styles.image, "js-img")}
+              id="texture2"
+            />
+            <h2>Caption 3</h2>
+          </div>
         </div>
-      </main>
+      </Layout>
       <Three />
     </StoreProvider>
   );
