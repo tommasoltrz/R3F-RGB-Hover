@@ -1,14 +1,19 @@
 import React, { createContext, FC, useEffect } from "react";
 import { useState } from "react";
+
 const initialState = {
-  x: 0,
-  y: 0,
+  mouse: { x: 0, y: 0 },
+  wSize: {
+    w: window.innerWidth,
+    h: window.innerHeight,
+  },
 };
 
 export const Context = createContext(initialState);
 
 export const StoreProvider: FC<any> = ({ children }) => {
-  const [state, setState] = useState(initialState);
+  const [mouse, setMouse] = useState(initialState.mouse);
+  const [wSize, setWSize] = useState(initialState.wSize);
   useEffect(() => {
     addEventListeners();
     return () => removeEventListeners();
@@ -16,20 +21,40 @@ export const StoreProvider: FC<any> = ({ children }) => {
 
   const addEventListeners = () => {
     document.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("resize", onWResize);
   };
 
   const removeEventListeners = () => {
-    document.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("resize", onWResize);
   };
 
   const onMouseMove = (e: any) => {
     requestAnimationFrame(() => {
-      setState({
+      setMouse({
         x: e.clientX,
         y: e.clientY,
       });
     });
   };
 
-  return <Context.Provider value={state}>{children}</Context.Provider>;
+  const onWResize = (e: any) => {
+    requestAnimationFrame(() => {
+      setWSize({
+        w: window.innerWidth,
+        h: window.innerHeight,
+      });
+    });
+  };
+
+  const providerValue = React.useMemo(
+    () => ({
+      mouse,
+      setMouse,
+      wSize,
+      setWSize,
+    }),
+    [mouse, wSize]
+  );
+
+  return <Context.Provider value={providerValue}>{children}</Context.Provider>;
 };

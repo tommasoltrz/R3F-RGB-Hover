@@ -15,14 +15,18 @@ import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import { Context } from "../StoreProvider/StoreProvider";
 import { CustomShaderMaterial } from "./shader";
 
-const Imager = React.memo(({ img }) => {
+const Imager = React.memo(({ img, wSize }) => {
   const ref = useRef();
-  const rec = img.getBoundingClientRect();
+  const [rec, setRec] = useState(img.getBoundingClientRect());
+  useEffect(() => {
+    setRec(img.getBoundingClientRect());
+  }, [wSize]);
+
   const texture = useLoader(THREE.TextureLoader, img.src);
   const elHeight = rec.height;
   const elWidth = rec.width;
   useEffect(() => {
-    img.style.opacity = 0;
+    img.style.opacity = 0.5;
 
     let imageAspect = elHeight / elWidth;
     let a1;
@@ -36,8 +40,8 @@ const Imager = React.memo(({ img }) => {
     }
 
     texture.needsUpdate = true;
-    ref.current.resolution.x = window.innerWidth;
-    ref.current.resolution.y = window.innerHeight;
+    ref.current.resolution.x = wSize.w;
+    ref.current.resolution.y = wSize.h;
     ref.current.resolution.z = a1;
     ref.current.resolution.w = a2;
     ref.current.uniforms.texture1.value = texture;
@@ -51,8 +55,8 @@ const Imager = React.memo(({ img }) => {
   return (
     <mesh
       position={[
-        0 - window.innerWidth / 2 + rec.left + rec.width / 2,
-        window.innerHeight / 2 - rec.height / 2 - rec.y - window.scrollY,
+        0 - wSize.w / 2 + rec.left + rec.width / 2,
+        wSize.h / 2 - rec.height / 2 - rec.y - window.scrollY,
         0,
       ]}
       scale={[1, 1, 1]}
@@ -63,10 +67,8 @@ const Imager = React.memo(({ img }) => {
   );
 });
 
-function Effect({ mouse }) {
+function Effect({ mouse, wSize }) {
   const { gl, scene, camera, size } = useThree();
-
-  let time = 0;
 
   const [composer] = useMemo(() => {
     const renderPass = new RenderPass(scene, camera);
@@ -125,14 +127,13 @@ function Effect({ mouse }) {
     composer.addPass(customPass);
 
     return [composer];
-  }, []);
+  }, [wSize]);
 
   useEffect(() => {
     composer.setSize(size.width, size.height);
-  }, [composer]);
+  }, [composer, wSize]);
 
   return useFrame(() => {
-    time += 0.05;
     const mouseY = 1 - mouse.y / window.innerHeight;
     const mouseX = mouse.x / window.innerWidth;
     const uMouse = {
@@ -145,12 +146,13 @@ function Effect({ mouse }) {
 }
 
 const Three = () => {
-  const pos = useContext(Context);
+  const { mouse, wSize } = useContext(Context);
   const ref = useRef();
   const [collection, setCollection] = useState();
   const [offset, setOffset] = useState();
 
   useEffect(() => {
+    setOffset(window.scrollY);
     setCollection(Array.from(document.getElementsByClassName("js-img")));
     document.addEventListener("scroll", onWinScroll);
     return () => document.removeEventListener("scroll", onWinScroll);
@@ -173,7 +175,6 @@ const Three = () => {
         overflow: "hidden",
         top: 0,
         left: 0,
-
         width: "100%",
         backgroundColor: "transparent",
         zIndex: -1,
@@ -181,11 +182,14 @@ const Three = () => {
       }}
     >
       <Suspense fallback={null}>
-        <group position={[0, offset || 0, 0]}>
-          {collection &&
-            collection.map((img, i) => <Imager img={img} key={i} />)}
-          <Effect mouse={pos} />
-        </group>
+        {offset !== undefined && collection && (
+          <group position={[0, offset, 0]}>
+            {collection.map((img, i) => (
+              <Imager img={img} key={i} wSize={wSize} />
+            ))}
+            <Effect mouse={mouse} wSize={wSize} />
+          </group>
+        )}
       </Suspense>
     </Canvas>
   );
