@@ -1,4 +1,4 @@
-## 🚀 RGB hover effect
+## ⚡ RGB hover effect
 
 This is a starter project for implementing React Three Fiber in Gatsby and applying custom shaders on images.
 
@@ -13,8 +13,9 @@ RGB color displacement is applied on mouse hover.
 - Typescript
 - Smooth, lerp based page scrolling
 - Scss
+- Sync between canvas and HTML
 
-## ⚡ Quick start
+## 🚀 Quick start
 
 1.  **Clone the repo**
 
@@ -22,7 +23,7 @@ RGB color displacement is applied on mouse hover.
     git clone https://github.com/tommasoltrz/R3F-RGB-Hover.git
     ```
 
-2.  **Start thr local server**
+2.  **Start the local server**
 
     Navigate into your new site’s directory and install the local dependencies first, then run the dev command.
 
