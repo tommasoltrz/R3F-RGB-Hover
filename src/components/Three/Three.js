@@ -26,7 +26,7 @@ const Imager = React.memo(({ img, wSize }) => {
   const elHeight = rec.height;
   const elWidth = rec.width;
   useEffect(() => {
-    img.style.opacity = 0.5;
+    img.style.opacity = 0;
 
     let imageAspect = elHeight / elWidth;
     let a1;
@@ -56,7 +56,7 @@ const Imager = React.memo(({ img, wSize }) => {
     <mesh
       position={[
         0 - wSize.w / 2 + rec.left + rec.width / 2,
-        wSize.h / 2 - rec.height / 2 - rec.y - window.scrollY,
+        wSize.h / 2 - rec.height / 2 - rec.y,
         0,
       ]}
       scale={[1, 1, 1]}
@@ -80,7 +80,7 @@ function Effect({ mouse, wSize }) {
       uniforms: {
         tDiffuse: { value: null },
         resolution: {
-          value: new THREE.Vector2(1, window.innerHeight / window.innerWidth),
+          value: new THREE.Vector2(1, wSize.h / wSize.w),
         },
         uMouse: { value: new THREE.Vector2(-10, -10) },
         uVelo: { value: 0 },
@@ -146,11 +146,10 @@ function Effect({ mouse, wSize }) {
 }
 
 const Three = () => {
-  const { mouse, wSize } = useContext(Context);
+  const { mouse, wSize, top } = useContext(Context);
   const ref = useRef();
   const [collection, setCollection] = useState();
   const [offset, setOffset] = useState();
-
   useEffect(() => {
     setOffset(window.scrollY);
     setCollection(Array.from(document.getElementsByClassName("js-img")));
@@ -182,8 +181,8 @@ const Three = () => {
       }}
     >
       <Suspense fallback={null}>
-        {offset !== undefined && collection && (
-          <group position={[0, offset, 0]}>
+        {top !== undefined && collection && (
+          <group position={[0, top, 0]}>
             {collection.map((img, i) => (
               <Imager img={img} key={i} wSize={wSize} />
             ))}

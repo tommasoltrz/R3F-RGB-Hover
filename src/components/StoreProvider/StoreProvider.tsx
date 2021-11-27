@@ -1,4 +1,4 @@
-import React, { createContext, FC, useEffect } from "react";
+import React, { createContext, FC, useEffect, useRef } from "react";
 import { useState } from "react";
 
 const initialState = {
@@ -7,6 +7,7 @@ const initialState = {
     w: window.innerWidth,
     h: window.innerHeight,
   },
+  top: 0,
 };
 
 export const Context = createContext(initialState);
@@ -14,10 +15,35 @@ export const Context = createContext(initialState);
 export const StoreProvider: FC<any> = ({ children }) => {
   const [mouse, setMouse] = useState(initialState.mouse);
   const [wSize, setWSize] = useState(initialState.wSize);
+  const [top, setTop] = useState(initialState.top);
+  const requestRef = useRef<number>();
+
+  let current = 0;
+  let target = 0;
+  let ease = 0.075;
+  const MathUtils = {
+    // map number x from range [a, b] to [c, d]
+    map: (x, a, b, c, d) => ((x - a) * (d - c)) / (b - a) + c,
+    // linear interpolation
+    lerp: (a, b, n) => (1 - n) * a + n * b,
+  };
+
   useEffect(() => {
     addEventListeners();
     return () => removeEventListeners();
   }, []);
+
+  useEffect(() => {
+    requestRef.current = requestAnimationFrame(updateScroll);
+    return () => cancelAnimationFrame(requestRef.current);
+  }, []);
+
+  const updateScroll = () => {
+    target = window.scrollY;
+    current = MathUtils.lerp(current, target, ease);
+    setTop(current);
+    requestRef.current = requestAnimationFrame(updateScroll);
+  };
 
   const addEventListeners = () => {
     document.addEventListener("mousemove", onMouseMove);
@@ -25,6 +51,7 @@ export const StoreProvider: FC<any> = ({ children }) => {
   };
 
   const removeEventListeners = () => {
+    document.removeEventListener("mousemove", onMouseMove);
     window.removeEventListener("resize", onWResize);
   };
 
@@ -49,11 +76,10 @@ export const StoreProvider: FC<any> = ({ children }) => {
   const providerValue = React.useMemo(
     () => ({
       mouse,
-      setMouse,
       wSize,
-      setWSize,
+      top,
     }),
-    [mouse, wSize]
+    [mouse, wSize, top]
   );
 
   return <Context.Provider value={providerValue}>{children}</Context.Provider>;
