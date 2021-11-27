@@ -6,7 +6,6 @@ import img3 from "../images/test-3.jpeg";
 import { StoreProvider } from "../components/StoreProvider/StoreProvider";
 import Three from "../components/Three/Three";
 import cn from "classnames";
-import { useEffect, useState } from "react";
 const IndexPage = () => {
   return (
     <StoreProvider>
@@ -19,21 +18,21 @@ const IndexPage = () => {
             className={cn(styles.image, "js-img")}
             id="texture"
           />
-
-          <h1>Helloooo</h1>
+          <h2>caption 1</h2>
           <img
             src={img2}
             alt=""
             className={cn(styles.image, "js-img")}
             id="texture2"
           />
-          <h1>Helloooo</h1>
+          <h2>caption 2</h2>
           <img
             src={img3}
             alt=""
             className={cn(styles.image, "js-img")}
             id="texture2"
           />
+          <h2>caption 3</h2>
         </div>
       </main>
       <Three />

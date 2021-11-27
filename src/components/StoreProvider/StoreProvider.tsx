@@ -49,9 +49,7 @@ export const StoreProvider: FC<any> = ({ children }) => {
   const providerValue = React.useMemo(
     () => ({
       mouse,
-      setMouse,
       wSize,
-      setWSize,
     }),
     [mouse, wSize]
   );

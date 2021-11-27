@@ -1,4 +1,3 @@
-import * as styles from "./Three.module.scss";
 import * as THREE from "three";
 import React, {
   useMemo,
@@ -26,7 +25,7 @@ const Imager = React.memo(({ img, wSize }) => {
   const elHeight = rec.height;
   const elWidth = rec.width;
   useEffect(() => {
-    img.style.opacity = 0.5;
+    img.style.opacity = 0;
 
     let imageAspect = elHeight / elWidth;
     let a1;
