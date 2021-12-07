@@ -4,8 +4,8 @@ import { useState } from "react";
 const initialState = {
   mouse: { x: 0, y: 0 },
   wSize: {
-    w: window.innerWidth,
-    h: window.innerHeight,
+    w: 0,
+    h: 0,
   },
   top: 0,
 };
@@ -30,6 +30,12 @@ export const StoreProvider: FC<any> = ({ children }) => {
   };
 
   useEffect(() => {
+    if (typeof window !== `undefined`) {
+      setWSize({
+        w: window.innerWidth,
+        h: window.innerHeight,
+      });
+    }
     addEventListeners();
     return () => removeEventListeners();
   }, []);

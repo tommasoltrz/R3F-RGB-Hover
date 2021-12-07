@@ -9,6 +9,14 @@ import cn from "classnames";
 import Layout from "../components/Layout/Layout";
 import { StoreProvider } from "../components/StoreProvider/StoreProvider";
 const IndexPage = () => {
+  // TODO move this to its own Image component
+  const onImgLoaded = () => {
+    const scrollMain = document.getElementById("scrollArea");
+    document.body.style.height = `${
+      scrollMain?.getBoundingClientRect().height
+    }px`;
+  };
+
   return (
     <StoreProvider>
       <Layout>
@@ -19,6 +27,7 @@ const IndexPage = () => {
               alt=""
               className={cn(styles.image, "js-img")}
               id="texture"
+              onLoad={() => onImgLoaded()}
             />
             <h2>Shamanic dance</h2>
             <p>
@@ -34,6 +43,7 @@ const IndexPage = () => {
               alt=""
               className={cn(styles.image, "js-img")}
               id="texture2"
+              onLoad={() => onImgLoaded()}
             />
             <h2>Shamanic dance</h2>
             <p>
@@ -48,6 +58,7 @@ const IndexPage = () => {
               alt=""
               className={cn(styles.image, "js-img")}
               id="texture2"
+              onLoad={() => onImgLoaded()}
             />
             <h2>Shamanic dance</h2>
             <p>

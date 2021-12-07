@@ -153,7 +153,7 @@ const Three = () => {
       ref={ref}
       camera={{ position: [0, 0, 500] }}
       orthographic
-      dpr={Math.min(window.devicePixelRatio, 2)}
+      dpr={2}
       alpha={true}
       style={{
         position: "fixed",
