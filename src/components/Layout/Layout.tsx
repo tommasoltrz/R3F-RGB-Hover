@@ -26,9 +26,14 @@ const Layout = ({ children }) => {
   }, [wSize]);
 
   return (
-    <main ref={scrollArea} data-scroll className={styles.scrollArea}>
-      {children}
-    </main>
+    <>
+      <a href="https://github.com/tommasoltrz/R3F-RGB-Hover" target="_blank">
+        <p className={"source"}>View source code on Github</p>
+      </a>
+      <main ref={scrollArea} data-scroll className={styles.scrollArea}>
+        {children}
+      </main>
+    </>
   );
 };
 

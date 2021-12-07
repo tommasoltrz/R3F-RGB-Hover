@@ -1,0 +1,154 @@
+@import "variables";
+
+.grid {
+  --grid-cols: #{$grid-columns};
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), 1fr);
+  max-width: $grid-max-width;
+  margin: auto;
+
+  // Gutters
+  column-gap: $gutters;
+  @media only screen and (min-width: $breakpoint-sm) {
+    column-gap: $gutters-sm;
+  }
+  @media only screen and (min-width: $breakpoint-lg) {
+    column-gap: $gutters-lg;
+  }
+
+  &.no-gutters {
+    column-gap: 0;
+  }
+
+  // margins left/right
+  padding-left: $grid-margins;
+  padding-right: $grid-margins;
+
+  @media only screen and (min-width: $breakpoint-sm) {
+    padding-left: $grid-margins-sm;
+    padding-right: $grid-margins-sm;
+  }
+  @media only screen and (min-width: $breakpoint-lg) {
+    padding-left: $grid-margins-lg;
+    padding-right: $grid-margins-lg;
+  }
+
+  &.no-pad {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  @media (max-width: #{$breakpoint-sm - 1px}) {
+    &.no-pad-xs {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  @media only screen and (min-width: $breakpoint-sm) and (max-width: #{$breakpoint-md - 1px}) {
+    &.no-pad-sm {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  @media only screen and (min-width: $breakpoint-md) and (max-width: #{$breakpoint-lg - 1px}) {
+    &.no-pad-md {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  @media only screen and (min-width: $breakpoint-lg) {
+    &.no-pad-lg {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  // each grid item takes full-width by default
+  > * {
+    grid-column-end: span var(--grid-cols);
+  }
+}
+
+// Columns
+
+@for $i from 1 through $grid-columns {
+  .col-#{$i} {
+    grid-column-end: span #{$i};
+  }
+}
+// from 768px up
+@media only screen and (min-width: $breakpoint-sm) {
+  @for $i from 1 through $grid-columns {
+    .col-sm-#{$i} {
+      grid-column-end: span #{$i};
+    }
+  }
+}
+
+// from 1024px up
+@media only screen and (min-width: $breakpoint-md) {
+  @for $i from 1 through $grid-columns {
+    .col-md-#{$i} {
+      grid-column-end: span #{$i};
+    }
+  }
+}
+
+// from 1200px up
+@media only screen and (min-width: $breakpoint-lg) {
+  @for $i from 1 through $grid-columns {
+    .col-lg-#{$i} {
+      grid-column-end: span #{$i};
+    }
+  }
+}
+
+// Offsets
+
+@for $i from 1 through $grid-columns {
+  .col-start-#{$i} {
+    grid-column-start: #{$i};
+  }
+  .col-end-#{$i} {
+    grid-column-end: #{$i + 1};
+  }
+}
+
+// from 768px up
+@media only screen and (min-width: $breakpoint-sm) and (max-width: $breakpoint-md) {
+  @for $i from 1 through $grid-columns {
+    .col-start-sm-#{$i} {
+      grid-column-start: #{$i};
+    }
+    .col-end-sm-#{$i} {
+      grid-column-end: #{$i + 1};
+    }
+  }
+}
+
+// from 1024px up
+@media only screen and (min-width: $breakpoint-md) and (max-width: $breakpoint-lg) {
+  @for $i from 1 through $grid-columns {
+    .col-start-md-#{$i} {
+      grid-column-start: #{$i};
+    }
+    .col-end-md-#{$i} {
+      grid-column-end: #{$i + 1};
+    }
+  }
+}
+
+// from 1200px up
+@media only screen and (min-width: $breakpoint-lg) {
+  @for $i from 1 through $grid-columns {
+    .col-start-lg-#{$i} {
+      grid-column-start: #{$i};
+    }
+    .col-end-lg-#{$i} {
+      grid-column-end: #{$i + 1};
+    }
+  }
+}

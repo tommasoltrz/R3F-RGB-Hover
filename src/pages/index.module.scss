@@ -1,17 +1,22 @@
-.title {
-  margin-bottom: 32px;
-  text-align: center;
-}
-
 .imgContainer {
   display: flex;
   flex-direction: column;
+  max-width: 800px;
+  width: 100%;
+  margin: auto;
+  margin-bottom: 100px;
 }
 
 .image {
-  max-width: 400px;
+  max-width: 800px;
   width: 100%;
   display: inline-block;
   margin-top: 100px;
   cursor: pointer;
+}
+
+.captionContainer {
+  max-width: 400px;
+  width: 100%;
+  margin: auto;
 }
