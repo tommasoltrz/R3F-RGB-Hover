@@ -4,6 +4,8 @@ This is a starter project for implementing React Three Fiber in Gatsby and apply
 
 RGB color displacement is applied on mouse hover.
 
+[See Live Demo](https://rgb-hover-displacement.netlify.app/)
+
 ![Hover Effect](./src/images/hover-effect.png)
 
 ## ✨ Features
