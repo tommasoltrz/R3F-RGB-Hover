@@ -11,15 +11,18 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
-import { Context } from "../StoreProvider/StoreProvider";
 import { CustomShaderMaterial } from "./shaderMaterial";
+
+import { Context } from "../StoreProvider/StoreProvider";
 
 const Imager = React.memo(({ img, wSize }) => {
   const ref = useRef();
   const [rec, setRec] = useState(img.getBoundingClientRect());
+
   const texture = useLoader(THREE.TextureLoader, img.src);
   const elHeight = rec.height;
   const elWidth = rec.width;
+
   useEffect(() => {
     setRec(img.getBoundingClientRect());
     img.style.opacity = 0;
@@ -34,7 +37,7 @@ const Imager = React.memo(({ img, wSize }) => {
       a2 = elHeight / elWidth / imageAspect;
     }
 
-    texture.needsUpdate = true;
+    texture.needsUpdate = false;
     ref.current.resolution.x = wSize.w;
     ref.current.resolution.y = wSize.h;
     ref.current.resolution.z = a1;
@@ -46,7 +49,6 @@ const Imager = React.memo(({ img, wSize }) => {
     ref.current.side = THREE.DoubleSide;
     ref.current.uvRate1 = new THREE.Vector2(1, 1);
   }, [wSize]);
-
   return (
     <mesh
       position={[
@@ -62,7 +64,7 @@ const Imager = React.memo(({ img, wSize }) => {
   );
 });
 
-function Effect({ mouse, wSize }) {
+function Effect({ mouse, wSize, velo, fMouse }) {
   const { gl, scene, camera, size } = useThree();
 
   const [composer] = useMemo(() => {
@@ -82,36 +84,38 @@ function Effect({ mouse, wSize }) {
       },
       vertexShader: `varying vec2 vUv;void main() {vUv = uv;gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0 );}`,
       fragmentShader: `
-            uniform float time;
+        uniform float time;
         uniform sampler2D tDiffuse;
         uniform vec2 resolution;
         varying vec2 vUv;
         uniform vec2 uMouse;
+        uniform float uVelo;
         float circle(vec2 uv, vec2 disc_center, float disc_radius, float border_size) {
           uv -= disc_center;
           uv*=resolution;
           float dist = sqrt(dot(uv, uv));
           return smoothstep(disc_radius+border_size, disc_radius-border_size, dist);
         }
+
         void main()  {
             vec2 newUV = vUv;
-            float c = circle(vUv, uMouse, 0.0, 0.15);
-            float r = texture2D(tDiffuse, newUV.xy += c * (0.1 * .55)).x;
-            float g = texture2D(tDiffuse, newUV.xy += c * (0.1 * .525)).y;
-            float b = texture2D(tDiffuse, newUV.xy += c * (0.1 * .55)).z;
+            vec4 color = vec4(1.,0.,0.,1.);
 
-            // float ra = texture2D(tDiffuse, newUV.xy).a;
-            // float ga = texture2D(tDiffuse, newUV.xy ).a;
-            // float ba = texture2D(tDiffuse, newUV.xy).a;
-
-            // if (ra == 0.0 && ba == 0.0 && ga == 0.0) {
-            //     discard;
-            // }
+            float c = circle(newUV, uMouse, 0.01, 0.3);
+            float r = texture2D(tDiffuse, newUV.xy += c * (uVelo * .5)).x;
+            float g = texture2D(tDiffuse, newUV.xy += c * (uVelo * .525)).y;
+            float b = texture2D(tDiffuse, newUV.xy += c * (uVelo * .55)).z;
             if (r == 0.0 && b == 0.0 && g == 0.0) {
                 discard;
             }
- 
-            vec4 color = vec4(r, g, b, 1.0).rgba;
+            color = vec4(r, g, b, 1.0).rgba;
+
+            // float c = circle(newUV, uMouse, 0.0, 0.1+uVelo*2.)*40.*uVelo;
+            // vec2 offsetVector = normalize(uMouse - vUv);
+            // vec2 warpedUV = mix(vUv, uMouse, c * 0.99); //power
+            // color = texture2D(tDiffuse,warpedUV) + texture2D(tDiffuse,warpedUV)*vec4(vec3(c),1.);
+
+
 
             gl_FragColor = color;
         }`,
@@ -129,56 +133,69 @@ function Effect({ mouse, wSize }) {
   }, [composer, wSize]);
 
   return useFrame(() => {
-    const mouseY = 1 - mouse.y / window.innerHeight;
-    const mouseX = mouse.x / window.innerWidth;
+    const mouseY = 1 - mouse.y / wSize.h;
+    const mouseX = mouse.x / wSize.w;
     const uMouse = {
       x: mouseX,
       y: mouseY,
     };
-    composer.passes[1].uniforms.uMouse.value = uMouse;
+    composer.passes[1].uniforms.uMouse.value = fMouse;
+    composer.passes[1].uniforms.uVelo.value = velo;
     composer.render();
   }, 1);
 }
 
 const Three = () => {
-  const { mouse, wSize, top } = useContext(Context);
+  const { mouse, wSize, top, velo, fMouse } = useContext(Context);
   const ref = useRef();
   const [collection, setCollection] = useState();
+  const [touchDevice, setTouchDevice] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
   useEffect(() => {
+    setTouchDevice("ontouchstart" in window);
     setCollection(Array.from(document.getElementsByClassName("js-img")));
+    // TODO replace this and run it when scroll stops
+    setTimeout(() => {
+      setLoaded(true);
+    }, 1000);
   }, []);
 
   return (
-    <Canvas
-      ref={ref}
-      camera={{ position: [0, 0, 500] }}
-      orthographic
-      dpr={2}
-      alpha={true}
-      style={{
-        position: "fixed",
-        height: "100%",
-        overflow: "hidden",
-        top: 0,
-        left: 0,
-        width: "100%",
-        backgroundColor: "transparent",
-        zIndex: 0,
-        pointerEvents: "none",
-      }}
-    >
-      <Suspense fallback={null}>
-        {top !== undefined && collection && (
-          <group position={[0, top, 0]}>
-            {collection.map((img, i) => (
-              <Imager img={img} key={i} wSize={wSize} />
-            ))}
-            <Effect mouse={mouse} wSize={wSize} />
-          </group>
-        )}
-      </Suspense>
-    </Canvas>
+    <>
+      {loaded && top !== undefined && collection && !touchDevice ? (
+        <Canvas
+          ref={ref}
+          camera={{ position: [0, 0, 500] }}
+          orthographic
+          dpr={Math.min(window.devicePixelRatio, 2)}
+          alpha={true}
+          style={{
+            position: "fixed",
+            height: "100%",
+            overflow: "hidden",
+            top: 0,
+            left: 0,
+            width: "100%",
+            backgroundColor: "transparent",
+            zIndex: 0,
+            pointerEvents: "none",
+          }}
+        >
+          <Suspense fallback={null}>
+            <group position={[0, top, 0]}>
+              {collection.map((img, i) => (
+                <Imager img={img} key={i} wSize={wSize} />
+              ))}
+              <Effect mouse={mouse} wSize={wSize} velo={velo} fMouse={fMouse} />
+            </group>
+          </Suspense>
+        </Canvas>
+      ) : (
+        <div></div>
+      )}
+    </>
   );
 };
-
+Imager.displayName = "Imager";
 export default Three;
