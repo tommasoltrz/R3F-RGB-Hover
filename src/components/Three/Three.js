@@ -38,6 +38,7 @@ const Imager = React.memo(({ img, wSize }) => {
     }
 
     texture.needsUpdate = false;
+    texture.minFilter = THREE.LinearFilter;
     ref.current.resolution.x = wSize.w;
     ref.current.resolution.y = wSize.h;
     ref.current.resolution.z = a1;
